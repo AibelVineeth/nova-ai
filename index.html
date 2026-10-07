@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <!-- Primary SEO -->
+  <title>Nova AI Assistant — Free Local Voice AI for Windows | Download</title>
+  <meta name="description" content="Download Nova, a free local voice AI assistant for Windows. Speech recognition, persistent memory, camera vision, browser control, Hindi &amp; Malayalam support. One-click Python setup — no cloud account required." />
+  <meta name="keywords" content="Nova AI, voice assistant, local AI assistant, free voice AI Windows, offline AI assistant, Python voice assistant, speech recognition desktop, AI with memory, Hindi voice assistant, Malayalam AI, download Nova AI" />
+  <meta name="author" content="Aibel" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <meta name="googlebot" content="index, follow" />
+  <link rel="canonical" href="https://AibelVineeth.github.io/nova-ai/" />
+
+  <!-- Open Graph (Facebook, LinkedIn, Discord, etc.) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Nova AI Assistant" />
+  <meta property="og:title" content="Nova AI Assistant — Free Local Voice AI for Windows" />
+  <meta property="og:description" content="Free desktop voice AI with memory, vision, browser control, and multi-language support. Runs on your PC. One-click setup." />
+  <meta property="og:url" content="https://AibelVineeth.github.io/nova-ai/" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image" content="https://AibelVineeth.github.io/nova-ai/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Nova AI Assistant — local voice AI for Windows" />
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Nova AI Assistant — Free Local Voice AI for Windows" />
+  <meta name="twitter:description" content="Download free local voice AI with memory, vision &amp; multi-language support. One-click setup for Windows." />
+  <meta name="twitter:image" content="https://AibelVineeth.github.io/nova-ai/og-image.png" />
+
+  <!-- Theme & mobile -->
+  <meta name="theme-color" content="#070d12" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="application-name" content="Nova AI Assistant" />
+
+  <!-- Structured data for Google rich results -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://AibelVineeth.github.io/nova-ai/#website",
+        "url": "https://AibelVineeth.github.io/nova-ai/",
+        "name": "Nova AI Assistant",
+        "description": "Free local voice AI assistant for Windows with memory, vision, and multi-language support.",
+        "publisher": { "@id": "https://AibelVineeth.github.io/nova-ai/#publisher" },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://AibelVineeth.github.io/nova-ai/?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://AibelVineeth.github.io/nova-ai/#app",
+        "name": "Nova AI Assistant",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Windows 10, Windows 11",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "description": "Local desktop voice AI assistant with persistent memory, camera vision, browser automation, English Hindi and Malayalam support, and one-click Python setup.",
+        "downloadUrl": "https://AibelVineeth.github.io/nova-ai/files/setup_nova.py",
+        "softwareVersion": "1.0",
+        "author": { "@id": "https://AibelVineeth.github.io/nova-ai/#publisher" },
+        "featureList": [
+          "Voice speech recognition and neural TTS",
+          "Persistent conversation memory and notes",
+          "Camera and screen vision with YOLO",
+          "Browser search and control",
+          "English, Hindi, and Malayalam",
+          "One-click automatic dependency installer"
+        ]
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://AibelVineeth.github.io/nova-ai/#publisher",
+        "name": "Aibel",
+        "url": "https://AibelVineeth.github.io/nova-ai/"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Does Nova need the internet after install?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Speech recognition and edge-tts voices use online services. Core GUI and local memory work offline. The vision model is local once yolov8n.pt is present. Hindi and Malayalam translation needs a network call."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is Nova AI free to download?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Nova is free to download and run on your own PC. No cloud account is required for core features."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I install Nova voice assistant on Windows?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Install Python 3.10 or newer, download nova.py and setup_nova.py into one folder, then double-click setup_and_run.bat or run python setup_nova.py. The auto installer creates a virtual environment, installs packages, downloads the vision model, and launches Nova."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #070d12;
+      --bg-elevated: #0c141c;
+      --panel: #101a24;
+      --panel-border: #1c2d3d;
+      --cyan: #3de0e8;
+      --cyan-dim: #1a6b72;
+      --cyan-glow: rgba(61, 224, 232, 0.18);
+      --text: #e8f4f6;
+      --text-dim: #7a9aa3;
+      --warn: #e8a83d;
+      --good: #3de88a;
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'IBM Plex Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(61, 224, 232, 0.12), transparent),
+        radial-gradient(ellipse 40% 30% at 90% 80%, rgba(61, 224, 232, 0.05), transparent);
+    }
+
+    a { color: var(--cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    /* ---- Header ---- */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: 0.04em;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      border: 2px solid var(--cyan);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--cyan);
+      box-shadow: 0 0 20px var(--cyan-glow);
+    }
+
+    nav { display: flex; gap: 20px; flex-wrap: wrap; }
+    nav a {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+    }
+    nav a:hover { color: var(--cyan); }
+
+    /* ---- Hero ---- */
+    .hero {
+      text-align: center;
+      padding: 24px 0 48px;
+    }
+
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--cyan);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+
+    h1 span { color: var(--cyan); }
+
+    .hero-lead {
+      max-width: 540px;
+      margin: 0 auto 28px;
+      color: var(--text-dim);
+      font-size: 1.05rem;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s;
+      text-decoration: none;
+      font-family: inherit;
+    }
+
+    .btn:hover { transform: translateY(-1px); text-decoration: none; }
+
+    .btn-primary {
+      background: var(--cyan);
+      color: #041016;
+      box-shadow: 0 0 28px var(--cyan-glow);
+    }
+    .btn-primary:hover { box-shadow: 0 0 40px rgba(61, 224, 232, 0.35); color: #041016; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--panel-border);
+    }
+    .btn-secondary:hover {
+      border-color: var(--cyan-dim);
+      color: var(--cyan);
+    }
+
+    .meta-line {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ---- Feature grid ---- */
+    section { margin-bottom: 56px; }
+
+    h2 {
+      font-size: 1.35rem;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .section-lead {
+      color: var(--text-dim);
+      margin-bottom: 24px;
+      max-width: 520px;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      padding: 20px 18px;
+      transition: border-color 0.15s;
+    }
+    .card:hover { border-color: var(--cyan-dim); }
+
+    .card .icon {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--cyan);
+      margin-bottom: 10px;
+      letter-spacing: 0.06em;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+      margin: 0;
+    }
+
+    /* ---- Download / setup ---- */
+    .panel {
+      background: var(--bg-elevated);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0.6;
+    }
+
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin: 20px 0 0;
+    }
+
+    .steps li {
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 14px;
+      align-items: start;
+      counter-increment: step;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--cyan-dim);
+      color: var(--cyan);
+      display: grid;
+      place-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .steps strong { display: block; margin-bottom: 4px; }
+
+    .steps p, .steps .hint {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+      margin: 0;
+    }
+
+    pre, code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+
+    pre {
+      background: var(--bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      overflow-x: auto;
+      margin: 8px 0 0;
+      color: var(--cyan);
+      line-height: 1.5;
+    }
+
+    .file-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .file-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+
+    .file-row .name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .file-row .desc {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      padding: 3px 7px;
+      border-radius: 4px;
+      border: 1px solid var(--panel-border);
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .tag.req { border-color: var(--cyan-dim); color: var(--cyan); }
+
+    /* ---- Requirements ---- */
+    .req-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .req-item {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 0.875rem;
+    }
+    .req-item strong { display: block; margin-bottom: 4px; color: var(--text); }
+    .req-item span { color: var(--text-dim); font-size: 0.8rem; }
+
+    /* ---- FAQ ---- */
+    details {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+    }
+    details summary {
+      cursor: pointer;
+      font-weight: 600;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::after {
+      content: '+';
+      color: var(--cyan);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 400;
+    }
+    details[open] summary::after { content: '−'; }
+    details p {
+      margin-top: 10px;
+      font-size: 0.875rem;
+      color: var(--text-dim);
+    }
+
+    footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--panel-border);
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+
+    .site-search-wrap {
+      max-width: 480px;
+      margin: 0 auto 40px;
+    }
+    .site-search-wrap input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--panel-border);
+      background: var(--panel);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .site-search-wrap input:focus {
+      border-color: var(--cyan-dim);
+      box-shadow: 0 0 0 3px var(--cyan-glow);
+    }
+    .site-search-wrap input::placeholder { color: var(--text-dim); }
+    .site-search-wrap .meta-line { margin-top: 8px; min-height: 1.2em; }
+
+    section.is-hidden { display: none; }
+
+    .about-block {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      padding: 22px 20px;
+      margin-bottom: 56px;
+      font-size: 0.95rem;
+      color: var(--text-dim);
+    }
+    .about-block h2 { color: var(--text); margin-bottom: 10px; }
+    .about-block p { margin-bottom: 10px; }
+    .about-block p:last-child { margin-bottom: 0; }
+
+    @media (max-width: 560px) {
+      .file-row { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">
+        <div class="logo-mark">NV</div>
+        Nova AI
+      </div>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#download">Download</a>
+        <a href="#setup">Setup</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">Free · Local · Voice AI · Windows</div>
+      <h1>Nova AI Assistant —<br /><span>free local voice AI</span> for your PC</h1>
+      <p class="hero-lead">
+        Search for a desktop voice assistant that runs on your computer, not only in the cloud.
+        Nova is a free local AI assistant with speech recognition, persistent memory, camera vision,
+        browser control, Hindi &amp; Malayalam support, and a one-click installer for Windows.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#download">Download Nova free</a>
+        <a class="btn btn-secondary" href="#setup">One-click setup</a>
+      </div>
+      <p class="meta-line">Python 3.10+ · Windows 10/11 · Microphone · Optional camera · No account required</p>
+    </section>
+
+    <!-- On-page search (filters sections for visitors) -->
+    <div class="site-search-wrap" role="search">
+      <label for="siteSearch" class="sr-only">Search this page</label>
+      <input id="siteSearch" type="search" placeholder="Search this page: memory, Hindi, install, vision…" autocomplete="off" />
+      <p id="searchStatus" class="meta-line" aria-live="polite"></p>
+    </div>
+
+    <section class="about-block" id="about" data-search="nova ai assistant free local voice desktop windows download offline privacy">
+      <h2>What is Nova AI?</h2>
+      <p>
+        <strong style="color:var(--text)">Nova</strong> is a free, local voice AI assistant for Windows.
+        People searching for an offline-friendly desktop assistant, a Python voice bot, or an alternative to
+        cloud-only smart speakers use Nova for speech-to-text, spoken replies, long-term memory, notes,
+        preferences, camera vision, and browser automation — all from one app on their own PC.
+      </p>
+      <p>
+        Unlike many online chatbots, core memory and the control panel stay on your machine
+        (<code>%APPDATA%\Nova</code> on Windows). You do not need a paid API key to start listening and talking.
+        English, Hindi, and Malayalam are supported for input and replies.
+      </p>
+    </section>
+
+    <section id="features" data-search="features voice speech memory vision camera browser system volume hud hindi malayalam">
+      <h2>What Nova can do</h2>
+      <p class="section-lead">Built as one application with optional modules that load only when you use them.</p>
+      <div class="features">
+        <div class="card">
+          <div class="icon">VOICE</div>
+          <h3>Speech in &amp; out</h3>
+          <p>Listen continuously, reply with neural TTS. English, Hindi, and Malayalam supported.</p>
+        </div>
+        <div class="card">
+          <div class="icon">MEMORY</div>
+          <h3>Persistent memory</h3>
+          <p>Remembers facts, notes, preferences, and routines across restarts. Full archive search.</p>
+        </div>
+        <div class="card">
+          <div class="icon">VISION</div>
+          <h3>Camera &amp; screen</h3>
+          <p>Optional YOLO vision and screen capture when you need eyes on the desk or display.</p>
+        </div>
+        <div class="card">
+          <div class="icon">BROWSER</div>
+          <h3>Browser control</h3>
+          <p>Search and automation via Selenium when Productive Mode or web tasks need a real browser.</p>
+        </div>
+        <div class="card">
+          <div class="icon">SYSTEM</div>
+          <h3>App &amp; volume</h3>
+          <p>Open apps, adjust system volume (Windows), and keep a live system load HUD.</p>
+        </div>
+        <div class="card">
+          <div class="icon">UI</div>
+          <h3>HUD interface</h3>
+          <p>Dark cyan control panel, smart cube, hologram viewer, tray icon — always at a glance.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="download" data-search="download free nova.py setup installer requirements yolo model package">
+      <h2>Download Nova AI free</h2>
+      <p class="section-lead">
+        Grab the source package and the auto-setup scripts. Host these files on your own server
+        or GitHub Releases and point the links below to the real URLs.
+      </p>
+
+      <div class="panel">
+        <div class="file-list">
+          <div class="file-row">
+            <div>
+              <div class="name">nova.py</div>
+              <div class="desc">Main application — single-file assistant (~488 KB source)</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span class="tag req">Required</span>
+              <a class="btn btn-secondary" href="files/nova.py" download>Download</a>
+            </div>
+          </div>
+
+          <div class="file-row">
+            <div>
+              <div class="name">setup_nova.py</div>
+              <div class="desc">Auto installer — creates a venv, installs every package, downloads the vision model, then launches Nova</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span class="tag req">Required</span>
+              <a class="btn btn-primary" href="files/setup_nova.py" download>Download</a>
+            </div>
+          </div>
+
+          <div class="file-row">
+            <div>
+              <div class="name">setup_and_run.bat</div>
+              <div class="desc">Windows double-click launcher — runs setup_nova.py with the system Python</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span class="tag req">Windows</span>
+              <a class="btn btn-secondary" href="files/setup_and_run.bat" download>Download</a>
+            </div>
+          </div>
+
+          <div class="file-row">
+            <div>
+              <div class="name">requirements.txt</div>
+              <div class="desc">Pinned dependency list used by the auto installer</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span class="tag">Optional</span>
+              <a class="btn btn-secondary" href="files/requirements.txt" download>Download</a>
+            </div>
+          </div>
+
+          <div class="file-row">
+            <div>
+              <div class="name">yolov8n.pt</div>
+              <div class="desc">YOLO vision weights (~6.2 MB). setup_nova.py will download this automatically if missing.</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span class="tag">Vision</span>
+              <a class="btn btn-secondary" href="files/yolov8n.pt" download>Download</a>
+            </div>
+          </div>
+
+          <div class="file-row">
+            <div>
+              <div class="name">kochi_intelligence_map.html</div>
+              <div class="desc">Bundled interactive Kochi map used by Nova</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span class="tag">Bundle</span>
+              <a class="btn btn-secondary" href="files/kochi_intelligence_map.html" download>Download</a>
+            </div>
+          </div>
+
+          <div class="file-row">
+            <div>
+              <div class="name">Packaging (build.bat · nova.spec · installer.iss)</div>
+              <div class="desc">For maintainers: build a Windows installer with PyInstaller + Inno Setup</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <span class="tag">Dev</span>
+              <a class="btn btn-secondary" href="#setup">See packaging notes</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="setup" data-search="setup install python pip venv windows bat one click auto installer how to">
+      <h2>One-click setup</h2>
+      <p class="section-lead">
+        The auto installer handles pip packages, optional vision stack, and the YOLO model.
+        You only need Python 3.10+ on the machine.
+      </p>
+
+      <div class="panel">
+        <ol class="steps">
+          <li>
+            <div>
+              <strong>Install Python</strong>
+              <p>Get Python 3.10 or newer from <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org</a>. On Windows, check <em>Add Python to PATH</em>.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>Put the files together</strong>
+              <p>Download at least <code>nova.py</code>, <code>setup_nova.py</code>, and (on Windows) <code>setup_and_run.bat</code> into the same folder. Optional: <code>requirements.txt</code>, <code>yolov8n.pt</code>, <code>kochi_intelligence_map.html</code>.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>Run the auto installer</strong>
+              <p class="hint">Windows — double-click <code>setup_and_run.bat</code>, or open a terminal in that folder:</p>
+              <pre>python setup_nova.py</pre>
+              <p class="hint" style="margin-top:10px;">The script will:</p>
+              <pre style="color:var(--text-dim);">• create a local .venv (optional, recommended)
+• upgrade pip
+• install core + optional packages
+• download yolov8n.pt if missing
+• launch Nova</pre>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>Allow mic (and camera if used)</strong>
+              <p>Windows may ask for microphone permission the first time. Say something after the calibration beep, or use the on-screen controls.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <h2 style="margin-top:36px;">System requirements</h2>
+      <div class="req-grid">
+        <div class="req-item">
+          <strong>OS</strong>
+          <span>Windows 10/11 recommended. Core voice works on other platforms; volume &amp; some app control are Windows-oriented.</span>
+        </div>
+        <div class="req-item">
+          <strong>Python</strong>
+          <span>3.10 or newer with pip. Virtual environment strongly recommended.</span>
+        </div>
+        <div class="req-item">
+          <strong>Hardware</strong>
+          <span>Microphone required. Camera optional for vision. ~2–4 GB free disk for full ML stack.</span>
+        </div>
+        <div class="req-item">
+          <strong>Network</strong>
+          <span>Needed for first install, speech recognition, TTS voices, and Hindi/Malayalam translation.</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" data-search="faq internet offline free install data privacy microphone error exe installer">
+      <h2>Frequently asked questions</h2>
+      <details>
+        <summary>Is Nova AI free to download?</summary>
+        <p>Yes. Nova is free to download and run on your own PC. No cloud account is required for core features.</p>
+      </details>
+      <details>
+        <summary>Does Nova need the internet after install?</summary>
+        <p>Speech recognition and edge-tts voices use online services. Core GUI and local memory work offline. Vision model is local once <code>yolov8n.pt</code> is present. Hindi/Malayalam translation needs a network call.</p>
+      </details>
+      <details>
+        <summary>How do I install Nova voice assistant on Windows?</summary>
+        <p>Install Python 3.10 or newer, download <code>nova.py</code> and <code>setup_nova.py</code> into one folder, then double-click <code>setup_and_run.bat</code> or run <code>python setup_nova.py</code>. The auto installer creates a virtual environment, installs packages, downloads the vision model, and launches Nova.</p>
+      </details>
+      <details>
+        <summary>Why is the first install slow?</summary>
+        <p>Optional packages include PyTorch, MediaPipe, and Ultralytics. Those are large. The app still starts without them; features that need them load on demand and will tell you if something is missing.</p>
+      </details>
+      <details>
+        <summary>Where is my data stored? Is it private?</summary>
+        <p>On Windows: <code>%APPDATA%\Nova\</code> (memory JSON, permanent archive, log). The app does not upload your conversation history to a Nova server.</p>
+      </details>
+      <details>
+        <summary>How do I build a full installer (.exe)?</summary>
+        <p>Use the included packaging files: put <code>nova.py</code>, <code>nova.spec</code>, <code>installer.iss</code>, <code>nova_icon.ico</code>, <code>yolov8n.pt</code>, and <code>kochi_intelligence_map.html</code> together, install PyInstaller and Inno Setup, then run <code>build.bat</code>. Output lands in <code>installer_output\NovaSetup.exe</code>.</p>
+      </details>
+      <details>
+        <summary>Microphone errors or “already inside a context manager”</summary>
+        <p>Only one listener should own the mic. Restart Nova fully if a previous session crashed mid-listen. Close other apps that hold the microphone exclusive.</p>
+      </details>
+    </section>
+
+    <footer>
+      <p><strong style="color:var(--text)">Nova AI Assistant</strong> — free local voice AI for Windows · publisher: Aibel</p>
+      <p style="margin-top:8px;">Search terms: voice AI assistant, local AI Windows, free desktop speech recognition, Hindi Malayalam AI assistant</p>
+      <p style="margin-top:8px;">Static download site — host the <code>files/</code> folder with this page so search engines can index it.</p>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var input = document.getElementById('siteSearch');
+      var status = document.getElementById('searchStatus');
+      if (!input) return;
+      var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+
+      function filter() {
+        var q = (input.value || '').trim().toLowerCase();
+        var shown = 0;
+        sections.forEach(function (sec) {
+          if (!q) {
+            sec.classList.remove('is-hidden');
+            shown++;
+            return;
+          }
+          var blob = (sec.getAttribute('data-search') || '') + ' ' + (sec.textContent || '');
+          var match = blob.toLowerCase().indexOf(q) !== -1;
+          sec.classList.toggle('is-hidden', !match);
+          if (match) shown++;
+        });
+        status.textContent = q
+          ? (shown ? shown + ' section' + (shown === 1 ? '' : 's') + ' match “' + q + '”' : 'No sections match “' + q + '”')
+          : '';
+      }
+
+      input.addEventListener('input', filter);
+      input.addEventListener('search', filter);
+
+      // Deep link ?q= from schema SearchAction
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var q = params.get('q');
+        if (q) { input.value = q; filter(); }
+      } catch (e) {}
+    })();
+  </script>
+</body>
+</html>

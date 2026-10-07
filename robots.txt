@@ -1,0 +1,6 @@
+# Allow all search engines to index the Nova download site
+User-agent: *
+Allow: /
+
+# Sitemap location — update the domain when you publish
+Sitemap: https://AibelVineeth.github.io/nova-ai/sitemap.xml

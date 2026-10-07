@@ -4538,203 +4538,6 @@ def handle_news_command(cmd):
 
 
 # =====================================================================
-# ---------- Toolkit: notes, conversions, passwords, dice, world clock, QR ----------
-# =====================================================================
-# A home for several small, broadly useful utilities that don't need their
-# own whole feature area. Notes persist across restarts the same way
-# reminders do; everything else here is stateless/instant.
-import secrets
-import string
-
-# Note-taking already exists (add_note / get_all_notes / notes_reply,
-# wired into handle_note_and_recall_command above) - the Toolkit panel
-# below just gives it a visible home in the UI rather than re-implementing
-# it, so there's exactly one notes system, not two competing ones.
-LAST_PASSWORD = {"value": None, "time": None}
-LAST_QR = {"path": None, "data": None}
-QR_FILE = os.path.join(DATA_DIR, "nova_qrcode.png")
-
-
-# ---------- Unit converter ----------
-_LENGTH_TO_M = {"km": 1000, "kilometer": 1000, "kilometers": 1000, "kilometre": 1000, "kilometres": 1000,
-                "m": 1, "meter": 1, "meters": 1, "metre": 1, "metres": 1,
-                "cm": 0.01, "centimeter": 0.01, "centimeters": 0.01,
-                "mm": 0.001, "millimeter": 0.001, "millimeters": 0.001,
-                "mi": 1609.344, "mile": 1609.344, "miles": 1609.344,
-                "yd": 0.9144, "yard": 0.9144, "yards": 0.9144,
-                "ft": 0.3048, "foot": 0.3048, "feet": 0.3048,
-                "in": 0.0254, "inch": 0.0254, "inches": 0.0254}
-_WEIGHT_TO_KG = {"kg": 1, "kilogram": 1, "kilograms": 1, "g": 0.001, "gram": 0.001, "grams": 0.001,
-                 "mg": 0.000001, "milligram": 0.000001, "milligrams": 0.000001,
-                 "lb": 0.453592, "lbs": 0.453592, "pound": 0.453592, "pounds": 0.453592,
-                 "oz": 0.0283495, "ounce": 0.0283495, "ounces": 0.0283495,
-                 "ton": 907.185, "tons": 907.185, "tonne": 1000, "tonnes": 1000}
-_VOLUME_TO_L = {"l": 1, "liter": 1, "liters": 1, "litre": 1, "litres": 1,
-                "ml": 0.001, "milliliter": 0.001, "milliliters": 0.001,
-                "gal": 3.78541, "gallon": 3.78541, "gallons": 3.78541,
-                "cup": 0.236588, "cups": 0.236588,
-                "floz": 0.0295735, "fl oz": 0.0295735}
-
-
-def convert_units(text):
-    """-> (result_value, result_unit_label) or None if this isn't a
-    recognisable conversion."""
-    low = text.lower().replace("fl oz", "floz").replace("fluid ounces", "floz")
-    m = re.search(r"([\d.]+)\s*([a-z]+)\s+(?:to|in|into)\s+([a-z]+)", low)
-    if not m:
-        return None
-    val, frm, to = float(m.group(1)), m.group(2), m.group(3)
-
-    if frm in ("c", "celsius") and to in ("f", "fahrenheit"):
-        return val * 9 / 5 + 32, "\u00b0F"
-    if frm in ("f", "fahrenheit") and to in ("c", "celsius"):
-        return (val - 32) * 5 / 9, "\u00b0C"
-    if frm in ("c", "celsius") and to in ("k", "kelvin"):
-        return val + 273.15, "K"
-    if frm in ("k", "kelvin") and to in ("c", "celsius"):
-        return val - 273.15, "\u00b0C"
-    if frm in ("f", "fahrenheit") and to in ("k", "kelvin"):
-        return (val - 32) * 5 / 9 + 273.15, "K"
-    if frm in ("k", "kelvin") and to in ("f", "fahrenheit"):
-        return (val - 273.15) * 9 / 5 + 32, "\u00b0F"
-
-    for table in (_LENGTH_TO_M, _WEIGHT_TO_KG, _VOLUME_TO_L):
-        if frm in table and to in table:
-            base = val * table[frm]
-            return base / table[to], to
-    return None
-
-
-def handle_convert_command(cmd):
-    low = cmd.lower().strip().rstrip("?.!")
-    if not any(k in low for k in ("convert", " to ", " into ")) or not re.search(r"\d", low):
-        return None
-    result = convert_units(low)
-    if result is None:
-        return None
-    value, unit = result
-    shown = f"{value:.4g}"
-    return f"{cmd.strip().rstrip('?.!')} \u2248 {shown} {unit}"
-
-
-# ---------- Password generator ----------
-def generate_password(length=16, use_symbols=True):
-    length = max(6, min(64, length))
-    chars = string.ascii_letters + string.digits + (string.punctuation if use_symbols else "")
-    value = "".join(secrets.choice(chars) for _ in range(length))
-    LAST_PASSWORD["value"], LAST_PASSWORD["time"] = value, time.time()
-    return value
-
-
-def handle_password_command(cmd):
-    low = cmd.lower().strip().rstrip("?.!")
-    if not re.search(r"\bpassword\b", low) or "generate" not in low and "create" not in low and "new password" not in low:
-        return None
-    m = re.search(r"(\d+)\s*character", low)
-    length = int(m.group(1)) if m else 16
-    use_symbols = "without symbols" not in low and "no symbols" not in low
-    generate_password(length, use_symbols)
-    return f"Generated a {length}-character password - check the Toolkit panel to copy it."
-
-
-# ---------- Dice / coin / random picker ----------
-def handle_random_command(cmd):
-    low = cmd.lower().strip().rstrip("?.!")
-    if re.search(r"\b(flip|toss) a coin\b|\bcoin flip\b", low):
-        return f"{secrets.choice(['Heads', 'Tails'])}."
-
-    m = re.search(r"\broll (?:a |an )?(\d+)?\s*(?:-|\s)?sided\s*d(?:ice|ie)\b", low) or \
-        re.search(r"\broll (?:a |an )?d(\d+)\b", low) or \
-        re.search(r"\broll (?:a |an )?dice\b|\broll (?:a |an )?die\b", low)
-    if m:
-        sides = int(m.group(1)) if (m.lastindex and m.group(1)) else 6
-        return f"You rolled a {secrets.randbelow(sides) + 1} (out of {sides})."
-
-    m = re.search(r"\b(?:pick|choose|give me) (?:a )?(?:random )?number between (\d+) and (\d+)\b", low)
-    if m:
-        a, b = int(m.group(1)), int(m.group(2))
-        lo, hi = min(a, b), max(a, b)
-        return f"{secrets.randbelow(hi - lo + 1) + lo}."
-
-    m = re.search(r"\b(?:pick|choose) (?:one|between)[:]?\s*(.+)", low)
-    if m:
-        options = [o.strip(" ?.!") for o in re.split(r"\s*,\s*|\s+or\s+", m.group(1))]
-        options = [o for o in options if o]
-        if len(options) >= 2:
-            return f"I'd go with: {secrets.choice(options)}."
-    return None
-
-
-# ---------- World clock ----------
-# UTC offsets (hours) - doesn't auto-adjust for places that observe DST,
-# which keeps this dependency-free (zoneinfo needs an IANA tz database
-# that Windows doesn't ship by default). Good enough for "roughly what
-# time is it there right now", not for scheduling across DST boundaries.
-WORLD_CLOCK_OFFSETS = {
-    "new york": -5, "los angeles": -8, "san francisco": -8, "chicago": -6,
-    "toronto": -5, "london": 0, "paris": 1, "berlin": 1, "madrid": 1, "rome": 1,
-    "moscow": 3, "dubai": 4, "mumbai": 5.5, "delhi": 5.5, "bangalore": 5.5,
-    "kochi": 5.5, "kolkata": 5.5, "chennai": 5.5, "hyderabad": 5.5,
-    "singapore": 8, "hong kong": 8, "beijing": 8, "shanghai": 8,
-    "tokyo": 9, "seoul": 9, "sydney": 10, "melbourne": 10, "auckland": 12,
-}
-
-
-def handle_world_clock_command(cmd):
-    low = cmd.lower().strip().rstrip("?.!")
-    m = re.search(r"\btime (?:is it )?in ([a-z\s]+)$", low) or \
-        re.search(r"\bwhat'?s? (?:the )?time in ([a-z\s]+)$", low)
-    if not m:
-        return None
-    city = m.group(1).strip()
-    if city not in WORLD_CLOCK_OFFSETS:
-        return None  # unknown city - fall through to a normal web search instead of guessing
-    now = _dt.datetime.utcnow() + _dt.timedelta(hours=WORLD_CLOCK_OFFSETS[city])
-    return f"It's {now.strftime('%I:%M %p').lstrip('0')} in {city.title()}."
-
-
-# ---------- QR code (free keyless API: api.qrserver.com) ----------
-def generate_qr_code(data):
-    url = ("https://api.qrserver.com/v1/create-qr-code/?size=360x360&data="
-           + urllib.parse.quote(data))
-    req = urllib.request.Request(url, headers={"User-Agent": "NovaAssistant/1.0"})
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        img_bytes = resp.read()
-    os.makedirs(DATA_DIR, exist_ok=True)
-    with open(QR_FILE, "wb") as f:
-        f.write(img_bytes)
-    LAST_QR["path"], LAST_QR["data"] = QR_FILE, data
-    return QR_FILE
-
-
-def handle_qr_command(cmd):
-    low = cmd.lower().strip()
-    m = re.search(r"\b(?:generate|make|create) (?:a )?qr code for (.+)$", low) or \
-        re.search(r"\bqr code for (.+)$", low)
-    if not m:
-        return None
-    data = cmd[cmd.lower().index(m.group(1)):].strip() if m.group(1) in low else m.group(1).strip()
-    if not data:
-        return "What should the QR code link to or say?"
-    try:
-        generate_qr_code(data)
-    except Exception as e:
-        print("QR generation error:", e)
-        return "I couldn't reach the QR code service right now."
-    return f"QR code ready for '{data}' - check the Toolkit panel."
-
-
-def handle_toolkit_command(cmd):
-    """Tries every Toolkit utility in turn; returns the first real reply."""
-    for handler in (handle_convert_command, handle_password_command,
-                    handle_random_command, handle_world_clock_command, handle_qr_command):
-        reply = handler(cmd)
-        if reply is not None:
-            return reply
-    return None
-
-
-# =====================================================================
 # ---------- Volume control (Windows pycaw, optional) ----------
 # =====================================================================
 VOLUME_AVAILABLE = False
@@ -6772,12 +6575,6 @@ def choose_action_and_reply(command):
     if PRODUCTIVE_MODE_ACTIVE:
         if is_question(cmd) and not re.search(r"\b(my|your|you|yours|me|myself|yourself)\b", cmd):
             return (productive_web_redirect(cmd), None)
-
-    # ---- Toolkit: unit conversion, password generator, dice/coin/random
-    # picker, world clock, QR codes ----
-    toolkit_reply = handle_toolkit_command(cmd)
-    if toolkit_reply is not None:
-        return (toolkit_reply, None)
 
     # ---- Diagrams ("show me a diagram of X") ----
     m = DIAGRAM_TRIGGER_RE.search(cmd)
@@ -9176,89 +8973,6 @@ class NovaGUI:
         self._sched_msg, self._sched_msg_color = "Reminders speak up when they're due.", COLOR_TEXT_DIM
         start_scheduler()
 
-        # ---- TOOLKIT: notes (surfaces the existing note-taking feature),
-        # unit conversion, password generator, coin/dice, QR codes ----
-        self.toolkit_panel = Panel(left_col, "SYSTEM //", "TOOLKIT", 280, 430)
-        self.toolkit_panel.frame.pack(pady=(12, 0))
-        tkb = self.toolkit_panel.body
-
-        tk.Label(tkb, text="NOTES", font=("Consolas", 8, "bold"), fg=COLOR_CYAN,
-                  bg=COLOR_PANEL, anchor="w").pack(fill="x")
-        notes_row = tk.Frame(tkb, bg=COLOR_PANEL)
-        notes_row.pack(fill="x", pady=(2, 4))
-        self.toolkit_note_entry = tk.Entry(notes_row, font=("Consolas", 9), bg="#141c28", fg=COLOR_TEXT,
-                                           insertbackground=COLOR_CYAN, relief="flat")
-        self.toolkit_note_entry.bind("<Return>", lambda e: self._toolkit_add_note())
-        self.toolkit_note_entry.pack(side="left", fill="x", expand=True, ipady=3, padx=(0, 6))
-        tk.Button(notes_row, text="Add", font=("Consolas", 8, "bold"), fg=COLOR_BG, bg=COLOR_CYAN,
-                  relief="flat", padx=8, command=self._toolkit_add_note).pack(side="left")
-        self.toolkit_notes_label = tk.Label(tkb, text="No notes yet.", font=("Consolas", 8),
-                                            fg=COLOR_TEXT_DIM, bg=COLOR_PANEL, anchor="w",
-                                            justify="left", wraplength=260)
-        self.toolkit_notes_label.pack(fill="x", pady=(0, 8))
-
-        tk.Frame(tkb, bg=COLOR_PANEL_BORDER, height=1).pack(fill="x", pady=(0, 8))
-        tk.Label(tkb, text="CONVERT", font=("Consolas", 8, "bold"), fg=COLOR_CYAN,
-                  bg=COLOR_PANEL, anchor="w").pack(fill="x")
-        conv_row = tk.Frame(tkb, bg=COLOR_PANEL)
-        conv_row.pack(fill="x", pady=(2, 2))
-        self._toolkit_convert_placeholder = "10 km to miles"
-        self.toolkit_convert_entry = tk.Entry(conv_row, font=("Consolas", 9), bg="#141c28", fg=COLOR_TEXT_DIM,
-                                              insertbackground=COLOR_CYAN, relief="flat")
-        self.toolkit_convert_entry.insert(0, self._toolkit_convert_placeholder)
-        self.toolkit_convert_entry.bind("<FocusIn>", lambda e: self._entry_clear_placeholder(
-            self.toolkit_convert_entry, self._toolkit_convert_placeholder))
-        self.toolkit_convert_entry.bind("<Return>", lambda e: self._toolkit_convert())
-        self.toolkit_convert_entry.pack(side="left", fill="x", expand=True, ipady=3, padx=(0, 6))
-        tk.Button(conv_row, text="Go", font=("Consolas", 8, "bold"), fg=COLOR_BG, bg=COLOR_CYAN,
-                  relief="flat", padx=10, command=self._toolkit_convert).pack(side="left")
-        self.toolkit_convert_result = tk.Label(tkb, text="", font=("Consolas", 9, "bold"), fg=COLOR_GOOD,
-                                               bg=COLOR_PANEL, anchor="w")
-        self.toolkit_convert_result.pack(fill="x", pady=(2, 8))
-
-        tk.Frame(tkb, bg=COLOR_PANEL_BORDER, height=1).pack(fill="x", pady=(0, 8))
-        tk.Label(tkb, text="GENERATE", font=("Consolas", 8, "bold"), fg=COLOR_CYAN,
-                  bg=COLOR_PANEL, anchor="w").pack(fill="x")
-        gen_row = tk.Frame(tkb, bg=COLOR_PANEL)
-        gen_row.pack(fill="x", pady=(2, 2))
-        tk.Button(gen_row, text="Password", font=("Consolas", 8), fg=COLOR_TEXT, bg="#141c28",
-                  relief="flat", padx=8, command=self._toolkit_gen_password).pack(side="left", padx=(0, 4))
-        tk.Button(gen_row, text="Coin", font=("Consolas", 8), fg=COLOR_TEXT, bg="#141c28",
-                  relief="flat", padx=8, command=self._toolkit_flip_coin).pack(side="left", padx=(0, 4))
-        tk.Button(gen_row, text="Dice", font=("Consolas", 8), fg=COLOR_TEXT, bg="#141c28",
-                  relief="flat", padx=8, command=self._toolkit_roll_dice).pack(side="left")
-        self.toolkit_gen_result = tk.Label(tkb, text="", font=("Consolas", 9, "bold"), fg=COLOR_SPEAKING,
-                                           bg=COLOR_PANEL, anchor="w", wraplength=260)
-        self.toolkit_gen_result.pack(fill="x", pady=(4, 2))
-        tk.Button(tkb, text="Copy Password", font=("Consolas", 8), fg=COLOR_TEXT, bg="#141c28",
-                  relief="flat", padx=8, command=self._toolkit_copy_password).pack(fill="x", pady=(0, 8))
-
-        tk.Frame(tkb, bg=COLOR_PANEL_BORDER, height=1).pack(fill="x", pady=(0, 8))
-        tk.Label(tkb, text="QR CODE", font=("Consolas", 8, "bold"), fg=COLOR_CYAN,
-                  bg=COLOR_PANEL, anchor="w").pack(fill="x")
-        qr_row = tk.Frame(tkb, bg=COLOR_PANEL)
-        qr_row.pack(fill="x", pady=(2, 4))
-        self._toolkit_qr_placeholder = "https://..."
-        self.toolkit_qr_entry = tk.Entry(qr_row, font=("Consolas", 9), bg="#141c28", fg=COLOR_TEXT_DIM,
-                                         insertbackground=COLOR_CYAN, relief="flat")
-        self.toolkit_qr_entry.insert(0, self._toolkit_qr_placeholder)
-        self.toolkit_qr_entry.bind("<FocusIn>", lambda e: self._entry_clear_placeholder(
-            self.toolkit_qr_entry, self._toolkit_qr_placeholder))
-        self.toolkit_qr_entry.bind("<Return>", lambda e: self._toolkit_gen_qr())
-        self.toolkit_qr_entry.pack(side="left", fill="x", expand=True, ipady=3, padx=(0, 6))
-        tk.Button(qr_row, text="Make", font=("Consolas", 8, "bold"), fg=COLOR_BG, bg=COLOR_CYAN,
-                  relief="flat", padx=8, command=self._toolkit_gen_qr).pack(side="left")
-        self.toolkit_qr_status = tk.Label(tkb, text="", font=("Consolas", 8), fg=COLOR_TEXT_DIM,
-                                          bg=COLOR_PANEL, anchor="w")
-        self.toolkit_qr_status.pack(fill="x")
-
-        # Background threads (QR fetch) never touch widgets directly - they
-        # update this state, and _update_toolkit_panel (polled on the main
-        # thread) applies it, same pattern as the hologram panel.
-        self._toolkit_qr_status_state = ("", COLOR_TEXT_DIM, False)
-        self._toolkit_qr_dirty = False
-        self._toolkit_notes_last_shown = None
-
         # ---- Center: the core visualizer + controls + command bar ----
         tk.Label(center_col, text="Good day. How may I assist?",
                  font=("Segoe UI", 14, "bold"), fg=COLOR_TEXT, bg=COLOR_BG).pack(pady=(10, 6))
@@ -9385,9 +9099,6 @@ class NovaGUI:
         tk.Button(text_row, text="Go", font=("Segoe UI", 9, "bold"), fg=COLOR_BG, bg=COLOR_CYAN,
                   relief="flat", padx=10, command=self._hologram_text_go).pack(side="left")
 
-        # Split across two rows rather than one crowded line - packed into
-        # a single row, these 7 buttons ran wider than the panel itself and
-        # clipped the rightmost ones (Pulse's text was getting cut off).
         ctrl_row = tk.Frame(hb, bg=COLOR_PANEL)
         ctrl_row.pack(fill="x")
         for sym, cmd_fn in (
@@ -9403,15 +9114,12 @@ class NovaGUI:
                   relief="flat", padx=6, command=self._hologram_reset_click).pack(side="left", padx=2)
         tk.Button(ctrl_row, text="+", font=("Consolas", 9, "bold"), fg=COLOR_TEXT, bg="#141c28",
                   relief="flat", padx=8, command=lambda: self._hologram_zoom_click(1.2)).pack(side="left", padx=2)
-
-        ctrl_row2 = tk.Frame(hb, bg=COLOR_PANEL)
-        ctrl_row2.pack(fill="x", pady=(6, 0))
-        self.hologram_spin_button = tk.Button(ctrl_row2, text="\u23F8 Spin", font=("Consolas", 8), fg=COLOR_TEXT,
+        tk.Button(ctrl_row, text="\u26A1 Pulse", font=("Consolas", 8, "bold"), fg=COLOR_BG, bg=COLOR_GOLD,
+                  relief="flat", padx=6, command=self._hologram_pulse_click).pack(side="right", padx=(8, 2))
+        self.hologram_spin_button = tk.Button(ctrl_row, text="\u23F8", font=("Consolas", 9), fg=COLOR_TEXT,
                                               bg="#141c28", relief="flat", padx=8,
                                               command=self._hologram_toggle_spin)
-        self.hologram_spin_button.pack(side="left")
-        tk.Button(ctrl_row2, text="\u26A1 Pulse", font=("Consolas", 8, "bold"), fg=COLOR_BG, bg=COLOR_GOLD,
-                  relief="flat", padx=10, command=self._hologram_pulse_click).pack(side="right")
+        self.hologram_spin_button.pack(side="right", padx=2)
         self._hologram_last_shape_shown = None
 
         # ---- NEWS: India + World headlines, refreshed hourly, with an
@@ -9867,10 +9575,7 @@ class NovaGUI:
         area = WEATHER_STATE["area"]
         if area != self._flood_area or time.time() >= self._flood_next_refresh:  # area change or every 30 min
             self._flood_area = area
-            # Same reasoning as the weather panel above: retry quickly
-            # instead of waiting the full 30 minutes when we have no data
-            # yet or the last attempt failed.
-            self._flood_next_refresh = time.time() + (1800 if FLOOD_STATE["data"] and not FLOOD_STATE["error"] else 30)
+            self._flood_next_refresh = time.time() + 1800
             refresh_flood_async(area)
         d, err = FLOOD_STATE["data"], FLOOD_STATE["error"]
         snapshot = (id(d), err, area)
@@ -10099,95 +9804,6 @@ class NovaGUI:
         if entry.get() == placeholder:
             entry.delete(0, tk.END)
 
-    # ---- Toolkit panel ----
-    def _toolkit_add_note(self):
-        text = self.toolkit_note_entry.get().strip()
-        if not text:
-            return
-        self.toolkit_note_entry.delete(0, tk.END)
-        add_note(text)
-        log_activity(f"You (dashboard): note: {text}")
-        self._toolkit_notes_last_shown = None  # force the label to refresh
-
-    def _toolkit_convert(self):
-        text = self.toolkit_convert_entry.get().strip()
-        if not text or text == self._toolkit_convert_placeholder:
-            text = self._toolkit_convert_placeholder
-        result = convert_units(text)
-        log_activity(f"You (dashboard): convert {text}")
-        if result is None:
-            self.toolkit_convert_result.config(text="Couldn't parse that - try '10 km to miles'.", fg=COLOR_WARN)
-            return
-        value, unit = result
-        self.toolkit_convert_result.config(text=f"\u2248 {value:.4g} {unit}", fg=COLOR_GOOD)
-
-    def _toolkit_gen_password(self):
-        pw = generate_password(16, True)
-        self.toolkit_gen_result.config(text=pw)
-        log_activity("You (dashboard): generate password")
-
-    def _toolkit_copy_password(self):
-        if LAST_PASSWORD["value"]:
-            self.root.clipboard_clear()
-            self.root.clipboard_append(LAST_PASSWORD["value"])
-            log_activity("You (dashboard): copied password")
-
-    def _toolkit_flip_coin(self):
-        self.toolkit_gen_result.config(text=handle_random_command("flip a coin"))
-        log_activity("You (dashboard): flip a coin")
-
-    def _toolkit_roll_dice(self):
-        self.toolkit_gen_result.config(text=handle_random_command("roll a dice"))
-        log_activity("You (dashboard): roll a dice")
-
-    def _toolkit_gen_qr(self):
-        data = self.toolkit_qr_entry.get().strip()
-        if not data or data == self._toolkit_qr_placeholder:
-            return
-        log_activity(f"You (dashboard): generate qr code for {data}")
-        self._toolkit_qr_status_state, self._toolkit_qr_dirty = ("Generating...", COLOR_SPEAKING, False), True
-
-        def _work():
-            try:
-                generate_qr_code(data)
-                self._toolkit_qr_status_state = ("QR code ready.", COLOR_GOOD, True)
-            except Exception as e:
-                print("QR generation error:", e)
-                self._toolkit_qr_status_state = ("Couldn't reach the QR service.", COLOR_WARN, False)
-            self._toolkit_qr_dirty = True
-
-        threading.Thread(target=_work, daemon=True).start()
-
-    def _show_qr_popup(self):
-        try:
-            img = Image.open(QR_FILE)
-            photo = ImageTk.PhotoImage(img)
-            win = tk.Toplevel(self.root)
-            win.title("Nova QR Code")
-            win.configure(bg=COLOR_BG)
-            lbl = tk.Label(win, image=photo, bg=COLOR_BG, bd=0)
-            lbl.image = photo  # keep a reference - Tkinter drops images without one
-            lbl.pack(padx=12, pady=12)
-        except Exception as e:
-            print("QR popup error:", e)
-
-    def _update_toolkit_panel(self):
-        notes = get_all_notes()
-        snapshot = (len(notes), notes[-1]["text"] if notes else None)
-        if snapshot != self._toolkit_notes_last_shown:
-            self._toolkit_notes_last_shown = snapshot
-            if not notes:
-                self.toolkit_notes_label.config(text="No notes yet.")
-            else:
-                self.toolkit_notes_label.config(
-                    text="\n".join(f"\u2022 {n['text']}" for n in notes[-4:]))
-        if self._toolkit_qr_dirty:
-            self._toolkit_qr_dirty = False
-            text, color, should_open = self._toolkit_qr_status_state
-            self.toolkit_qr_status.config(text=text, fg=color)
-            if should_open:
-                self._show_qr_popup()
-
     def _whatsapp_send(self):
         target = self.whatsapp_to_entry.get().strip()
         message = self.whatsapp_msg_entry.get().strip()
@@ -10324,11 +9940,7 @@ class NovaGUI:
             self._weather_synced_area = WEATHER_STATE["area"]
             self.weather_area_var.set(WEATHER_STATE["area"])
         if time.time() >= self._weather_next_refresh:  # first run + every 10 minutes
-            # Retry soon (not a full 10 minutes) when we don't have data yet
-            # or the last attempt failed - otherwise a transient hiccup (e.g.
-            # network not ready yet right at startup) leaves the panel
-            # stuck looking "unavailable" for a long time over nothing.
-            self._weather_next_refresh = time.time() + (600 if WEATHER_STATE["data"] and not WEATHER_STATE["error"] else 30)
+            self._weather_next_refresh = time.time() + 600
             refresh_weather_async()
         d, err = WEATHER_STATE["data"], WEATHER_STATE["error"]
         snapshot = (id(d), err, WEATHER_STATE["loading"], WEATHER_STATE["area"])
@@ -10471,7 +10083,6 @@ class NovaGUI:
             self._update_phone_panel()
             self._update_whatsapp_panel()
             self._update_notif_panel()
-            self._update_toolkit_panel()
             self._update_swarm_panel()
             self._update_news_panel()
             self._update_log_panel()
