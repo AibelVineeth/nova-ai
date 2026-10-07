@@ -18,8 +18,13 @@ torch
 selenium>=4.15.0
 webdriver-manager>=4.0.0
 sympy>=1.12
+sentence-transformers>=2.2.0
 
 # ---- Windows-only helpers ----
 pycaw>=20240210; platform_system=="Windows"
 comtypes>=1.2.0; platform_system=="Windows"
 pywinauto>=0.6.8; platform_system=="Windows"
+
+# NOTE: Do NOT pip install ollama for Nova.
+# Nova talks to the Ollama desktop app over HTTP (localhost:11434).
+# Install from https://ollama.com then: ollama pull llama3.2-vision

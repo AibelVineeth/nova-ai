@@ -1,6 +1,6 @@
 @echo off
 REM setup_and_run.bat — double-click to install Nova deps and launch the app.
-REM Put this in the same folder as setup_nova.py and nova.py.
+REM Do NOT run nova.py from IDLE — use this script or: python setup_nova.py
 
 cd /d "%~dp0"
 
@@ -8,6 +8,10 @@ echo.
 echo  ========================================
 echo   Nova — automatic setup ^& launch
 echo  ========================================
+echo.
+echo  Tip: Do not open nova.py in IDLE (causes SpeechRecognition errors).
+echo  Ollama (optional AI): install from https://ollama.com
+echo         then run:  ollama pull llama3.2-vision
 echo.
 
 where python >nul 2>nul
@@ -22,7 +26,7 @@ if errorlevel 1 (
 
 if not exist "nova.py" (
     echo  nova.py is missing in this folder.
-    echo  Download it from the Nova site and place it next to this script.
+    echo  Unzip Nova-Bundle.zip fully first.
     echo.
     pause
     exit /b 1
@@ -41,6 +45,9 @@ set EXITCODE=%ERRORLEVEL%
 if not "%EXITCODE%"=="0" (
     echo.
     echo  Setup or launch exited with code %EXITCODE%.
+    echo  If you saw SpeechRecognition / pygame errors, run:
+    echo    python -m pip install SpeechRecognition pygame edge-tts Pillow pystray psutil PyAudio
+    echo  then run this script again.
     pause
 )
 
