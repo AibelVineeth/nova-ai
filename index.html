@@ -108,7 +108,7 @@
             "name": "How do I install Nova voice assistant on Windows?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Install Python 3.10 or newer, download nova.py and setup_nova.py into one folder, then double-click setup_and_run.bat or run python setup_nova.py. The auto installer creates a virtual environment, installs packages, downloads the vision model, and launches Nova."
+              "text": "Install Python 3.10+, install Ollama from ollama.com and run ollama pull llama3.2-vision, download Nova-Bundle.zip, unzip it, then double-click setup_and_run.bat. Do not run nova.py from IDLE."
             }
           }
         ]
@@ -711,44 +711,55 @@
       </div>
     </section>
 
-    <section id="setup" data-search="setup install python pip venv windows bat one click auto installer how to">
-      <h2>One-click setup</h2>
+    <section id="setup" data-search="setup install python pip venv windows bat one click auto installer ollama idle speech recognition how to">
+      <h2>Setup guide</h2>
       <p class="section-lead">
-        The auto installer handles pip packages, optional vision stack, and the YOLO model.
-        You only need Python 3.10+ on the machine.
+        Four steps: Python, Ollama (for local AI), the Nova bundle, then the auto installer.
+        Do <strong>not</strong> run <code>nova.py</code> from IDLE — that causes SpeechRecognition and package errors.
       </p>
 
       <div class="panel">
         <ol class="steps">
           <li>
             <div>
-              <strong>Install Python</strong>
-              <p>Get Python 3.10 or newer from <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org</a>. On Windows, check <em>Add Python to PATH</em>.</p>
+              <strong>Install Python 3.10+</strong>
+              <p>Get it from <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org</a>. On Windows, check <em>Add Python to PATH</em> and leave <em>tcl/tk</em> enabled.</p>
             </div>
           </li>
           <li>
             <div>
-              <strong>Put the files together</strong>
-              <p>Download at least <code>nova.py</code>, <code>setup_nova.py</code>, and (on Windows) <code>setup_and_run.bat</code> into the same folder. Optional: <code>requirements.txt</code>, <code>yolov8n.pt</code>, <code>kochi_intelligence_map.html</code>.</p>
+              <strong>Install Ollama (important for local AI)</strong>
+              <p>
+                Ollama is a <em>separate app</em> from the web — not a pip package.
+                Nova uses it for screen help and “ask AI” (private, on your PC).
+              </p>
+              <p class="hint" style="margin-top:8px;">1. Download and install from <a href="https://ollama.com" target="_blank" rel="noopener">https://ollama.com</a></p>
+              <p class="hint">2. Open a terminal and pull a vision model (one-time, large download):</p>
+              <pre>ollama pull llama3.2-vision</pre>
+              <p class="hint" style="margin-top:8px;">3. Keep the Ollama app running in the background whenever you use screen-AI features.</p>
+              <p class="hint" style="margin-top:8px;color:var(--warn);">Voice listening still works without Ollama. You only need it for local AI / screen help.</p>
             </div>
           </li>
           <li>
             <div>
-              <strong>Run the auto installer</strong>
-              <p class="hint">Windows — double-click <code>setup_and_run.bat</code>, or open a terminal in that folder:</p>
+              <strong>Download &amp; unzip Nova-Bundle.zip</strong>
+              <p>Use the big green button above. Unzip so these sit in <em>one folder</em>: <code>nova.py</code>, <code>setup_nova.py</code>, <code>setup_and_run.bat</code>, <code>requirements.txt</code>.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <strong>Run the auto installer (not IDLE)</strong>
+              <p class="hint">Windows — double-click <code>setup_and_run.bat</code>, or open <strong>Command Prompt / PowerShell</strong> in that folder:</p>
               <pre>python setup_nova.py</pre>
-              <p class="hint" style="margin-top:10px;">The script will:</p>
-              <pre style="color:var(--text-dim);">• create a local .venv (optional, recommended)
-• upgrade pip
-• install core + optional packages
-• download yolov8n.pt if missing
-• launch Nova</pre>
+              <p class="hint" style="margin-top:10px;">This creates a virtualenv, installs SpeechRecognition, pygame, and the rest, then launches Nova.</p>
+              <pre style="color:var(--warn);margin-top:10px;">Do NOT open nova.py in IDLE and press F5.
+IDLE uses a different environment → "No module named speech_recognition" / pygame errors.</pre>
             </div>
           </li>
           <li>
             <div>
-              <strong>Allow mic (and camera if used)</strong>
-              <p>Windows may ask for microphone permission the first time. Say something after the calibration beep, or use the on-screen controls.</p>
+              <strong>Allow microphone access</strong>
+              <p>Windows may ask for mic permission the first time. Stay silent during calibration, then speak.</p>
             </div>
           </li>
         </ol>
@@ -762,20 +773,20 @@
         </div>
         <div class="req-item">
           <strong>Python</strong>
-          <span>3.10 or newer with pip. Virtual environment strongly recommended.</span>
+          <span>3.10+ from python.org with PATH enabled. Do not launch from IDLE.</span>
+        </div>
+        <div class="req-item">
+          <strong>Ollama (optional but recommended)</strong>
+          <span>Desktop app from ollama.com + <code>ollama pull llama3.2-vision</code> for local AI / screen help.</span>
         </div>
         <div class="req-item">
           <strong>Hardware</strong>
-          <span>Microphone required. Camera optional for vision. ~2–4 GB free disk for full ML stack.</span>
-        </div>
-        <div class="req-item">
-          <strong>Network</strong>
-          <span>Needed for first install, speech recognition, TTS voices, and Hindi/Malayalam translation.</span>
+          <span>Microphone required. Camera optional. ~2–4 GB free disk for full ML stack; more if you pull Ollama models.</span>
         </div>
       </div>
     </section>
 
-    <section id="faq" data-search="faq internet offline free install data privacy microphone error exe installer">
+    <section id="faq" data-search="faq internet offline free install data privacy microphone error exe installer ollama idle speech recognition pygame">
       <h2>Frequently asked questions</h2>
       <details>
         <summary>Is Nova AI free to download?</summary>
@@ -787,7 +798,15 @@
       </details>
       <details>
         <summary>How do I install Nova voice assistant on Windows?</summary>
-        <p>Install Python 3.10 or newer, download <code>nova.py</code> and <code>setup_nova.py</code> into one folder, then double-click <code>setup_and_run.bat</code> or run <code>python setup_nova.py</code>. The auto installer creates a virtual environment, installs packages, downloads the vision model, and launches Nova.</p>
+        <p>Install Python 3.10+, install <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> and run <code>ollama pull llama3.2-vision</code>, download <code>Nova-Bundle.zip</code>, unzip it, then double-click <code>setup_and_run.bat</code> (do not use IDLE).</p>
+      </details>
+      <details>
+        <summary>Do I need to install Ollama?</summary>
+        <p>Yes for local AI / screen help / “ask AI”. Ollama is a separate program from <a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a> — not <code>pip install ollama</code>. After installing, run <code>ollama pull llama3.2-vision</code> once and keep Ollama running. Basic voice listening works without it.</p>
+      </details>
+      <details>
+        <summary>SpeechRecognition / pygame error when I run from IDLE</summary>
+        <p>IDLE does not use the virtual environment that <code>setup_nova.py</code> creates, so packages look “missing”. Close IDLE. Open the Nova folder in Command Prompt or PowerShell and run <code>python setup_nova.py</code>, or double-click <code>setup_and_run.bat</code>. To fix packages manually: <code>python -m pip install SpeechRecognition pygame edge-tts Pillow pystray psutil PyAudio</code>.</p>
       </details>
       <details>
         <summary>Why is the first install slow?</summary>
