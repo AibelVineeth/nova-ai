@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kochi Intelligence Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --water:#0F3D3E; --water-deep:#0A2C2D; --land:#E8DCC4; --land-edge:#D9C9A3;
+    --rust:#C1440E; --seafoam:#8FBFBF; --ink:#152623; --paper:#F6F1E6;
+    --panel:#FFFFFF; --panel-border:#DCD0AE; --text-dim:#5B6E68;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0D1A17; --ink:#EDE6D6; --panel:#132824; --panel-border:#274139; --text-dim:#9FB3AC;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0D1A17; --ink:#EDE6D6; --panel:#132824; --panel-border:#274139; --text-dim:#9FB3AC;
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0; height:100%; background:var(--paper); color:var(--ink);
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Fraunces',Georgia,serif; margin:0; font-weight:600;}
+
+  .app{max-width:1040px; margin:0 auto; padding:28px 20px 60px;}
+
+  header{margin-bottom:22px;}
+  .eyebrow{font-size:13px; color:var(--rust); letter-spacing:.02em; margin-bottom:6px;}
+  header h1{font-size:clamp(28px,5vw,42px); line-height:1.05;}
+  header p{max-width:52ch; color:var(--text-dim); font-size:15px; line-height:1.55; margin-top:10px;}
+
+  .map-wrap{
+    position:relative; width:100%; aspect-ratio:4/5; max-height:640px;
+    border-radius:18px; overflow:hidden; border:1px solid var(--panel-border);
+    background:
+      radial-gradient(ellipse at 30% 10%, #12504F 0%, var(--water) 45%, var(--water-deep) 100%);
+    box-shadow:0 20px 50px -25px rgba(0,0,0,.5);
+  }
+  .land{
+    position:absolute; background:var(--land); border:1px solid var(--land-edge);
+  }
+  .land.peninsula{ top:38%; left:8%; width:22%; height:26%; border-radius:60% 40% 55% 45% / 50% 55% 45% 50%; transform:rotate(-8deg);}
+  .land.willingdon{ top:38%; left:30%; width:9%; height:10%; border-radius:40%;}
+  .land.mainland{ top:8%; left:40%; width:48%; height:78%; border-radius:38% 30% 25% 45% / 40% 45% 40% 35%;}
+  .land.vypin{ top:2%; left:12%; width:16%; height:38%; border-radius:45% 55% 40% 60% / 60% 40% 60% 40%;}
+
+  .zone{
+    position:absolute; transform:translate(-50%,-50%);
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    background:none; border:none; cursor:pointer; padding:6px;
+  }
+  .zone .dot{
+    width:13px; height:13px; border-radius:50%; background:var(--rust);
+    border:2px solid var(--paper); box-shadow:0 0 0 3px rgba(193,68,14,.25);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .zone:hover .dot, .zone:focus-visible .dot{ transform:scale(1.35); box-shadow:0 0 0 6px rgba(193,68,14,.3); }
+  .zone .label{
+    font-size:11.5px; font-weight:500; color:var(--ink); background:rgba(246,241,230,.88);
+    padding:2px 6px; border-radius:4px; white-space:nowrap; pointer-events:none;
+  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .zone .label{ background:rgba(13,26,23,.85);} }
+  :root[data-theme="dark"] .zone .label{ background:rgba(13,26,23,.85); }
+  .zone:focus-visible{ outline:2px solid var(--seafoam); outline-offset:4px; border-radius:8px; }
+
+  .caption{margin-top:14px; font-size:13px; color:var(--text-dim);}
+
+  /* ---- Region detail ---- */
+  .detail{ display:none; }
+  .detail.open{ display:block; animation:rise .28s ease; }
+  @keyframes rise{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+  .back{
+    display:inline-flex; align-items:center; gap:6px; background:none; border:none; cursor:pointer;
+    color:var(--rust); font-family:'IBM Plex Sans',sans-serif; font-size:14px; font-weight:500;
+    padding:8px 0; margin-bottom:14px;
+  }
+  .detail h2{ font-size:clamp(24px,4vw,32px); }
+  .detail .sub{ color:var(--text-dim); font-size:14px; margin-top:4px; margin-bottom:22px; }
+
+  .cards{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:620px){ .cards{grid-template-columns:1fr;} }
+  .card{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:14px;
+    padding:18px 18px 16px;
+  }
+  .card .kicker{ font-size:12px; color:var(--rust); font-weight:600; margin-bottom:6px; }
+  .card h3{ font-size:18px; margin-bottom:8px; }
+  .card p{ font-size:13.5px; line-height:1.55; color:var(--text-dim); margin:0 0 14px; }
+  .card a{
+    display:inline-flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600;
+    color:var(--ink); text-decoration:none; border-bottom:1.5px solid var(--rust); padding-bottom:2px;
+  }
+  .card a:hover{ color:var(--rust); }
+
+  footer{ margin-top:34px; font-size:12.5px; color:var(--text-dim); line-height:1.6; max-width:60ch; }
+
+  @media (max-width: 500px){
+    .zone .label{ display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="eyebrow">Kochi, Kerala</div>
+    <h1>Kochi Intelligence Map</h1>
+    <p>Thirteen neighbourhoods across the city and its islands — Vypin to Thrippunithura, Fort Kochi to Kakkanad. Click a point to open its conditions: weather, seismic activity, air quality, and volcanic risk.</p>
+  </header>
+
+  <div id="mapView">
+    <div class="map-wrap" id="mapWrap">
+      <div class="land vypin"></div>
+      <div class="land peninsula"></div>
+      <div class="land willingdon"></div>
+      <div class="land mainland"></div>
+      <!-- zones positioned as % of map-wrap -->
+    </div>
+    <p class="caption">Map is a schematic layout, not a surveyed chart — positions are relative, not to scale.</p>
+  </div>
+
+  <div class="detail" id="detailView">
+    <button class="back" id="backBtn">&larr; Back to map</button>
+    <h2 id="detailTitle"></h2>
+    <p class="sub" id="detailSub"></p>
+    <div class="cards" id="detailCards"></div>
+  </div>
+
+  <footer>
+    Weather and air-quality links open a live search card for that area. Seismic activity opens USGS's real-time map for the wider South India region — Kerala sees very few recorded earthquakes. Volcanic activity is included for completeness: there are no active volcanoes anywhere near Kochi.
+  </footer>
+</div>
+
+<script>
+const ZONES = [
+  { id:"cherai", name:"Cherai / North Vypin", top:8,  left:22, note:"Beach strip at the northern tip of Vypin Island." },
+  { id:"vypin",  name:"Vypin",                top:26, left:19, note:"Island community across the harbour mouth from Fort Kochi." },
+  { id:"fortkochi", name:"Fort Kochi",         top:47, left:15, note:"Historic port town on the southern peninsula." },
+  { id:"mattancherry", name:"Mattancherry",    top:53, left:22, note:"Old spice-trade quarter adjoining Fort Kochi." },
+  { id:"willingdon", name:"Willingdon Island", top:44, left:34, note:"Artificial island in the harbour, between the peninsula and the mainland." },
+  { id:"ernakulam", name:"Ernakulam (MG Road)", top:38, left:49, note:"City centre — Marine Drive and MG Road." },
+  { id:"panampilly", name:"Panampilly Nagar",  top:50, left:51, note:"Residential district just south of the centre." },
+  { id:"vyttila", name:"Vyttila",              top:60, left:53, note:"Southern transit hub and junction." },
+  { id:"thrippunithura", name:"Thrippunithura", top:70, left:62, note:"Historic town south-east of the city, seat of the former royal palace." },
+  { id:"palarivattom", name:"Palarivattom",    top:32, left:58, note:"Junction linking the centre to the northern suburbs." },
+  { id:"edappally", name:"Edappally",          top:22, left:55, note:"Northern gateway junction and retail hub." },
+  { id:"kalamassery", name:"Kalamassery",      top:11, left:60, note:"Industrial belt on the northern edge of the city." },
+  { id:"kakkanad", name:"Kakkanad (Infopark)", top:30, left:76, note:"Eastern IT corridor — Infopark and Smart City." },
+];
+
+const mapWrap = document.getElementById('mapWrap');
+ZONES.forEach(z => {
+  const btn = document.createElement('button');
+  btn.className = 'zone';
+  btn.style.top = z.top + '%';
+  btn.style.left = z.left + '%';
+  btn.setAttribute('aria-label', 'Open conditions for ' + z.name);
+  btn.innerHTML = '<span class="dot"></span><span class="label">' + z.name + '</span>';
+  btn.addEventListener('click', () => openZone(z));
+  mapWrap.appendChild(btn);
+});
+
+const mapView = document.getElementById('mapView');
+const detailView = document.getElementById('detailView');
+const detailTitle = document.getElementById('detailTitle');
+const detailSub = document.getElementById('detailSub');
+const detailCards = document.getElementById('detailCards');
+
+function gsearch(q){ return 'https://www.google.com/search?q=' + encodeURIComponent(q); }
+
+function openZone(z){
+  detailTitle.textContent = z.name;
+  detailSub.textContent = z.note;
+
+  const cards = [
+    {
+      kicker: 'Live', title: 'Weather',
+      body: 'Current conditions and forecast for this part of Kochi.',
+      href: gsearch('weather in ' + z.name + ', Kochi'),
+      cta: 'Open live weather'
+    },
+    {
+      kicker: 'Live', title: 'Air quality',
+      body: 'Current AQI and pollutant levels reported for the area.',
+      href: gsearch('air quality index in ' + z.name + ', Kochi'),
+      cta: 'Open live air quality'
+    },
+    {
+      kicker: 'Reference', title: 'Seismic activity',
+      body: 'Kerala sits in a low-to-moderate seismic zone (Zone III) with occasional minor tremors. This opens USGS\u2019s real-time map for the wider South India region.',
+      href: 'https://earthquake.usgs.gov/earthquakes/map/?extent=5,68,16,82',
+      cta: 'Open live earthquake map'
+    },
+    {
+      kicker: 'Reference', title: 'Volcanic activity',
+      body: 'No active volcanoes exist near Kochi or anywhere on mainland India. India\u2019s only historically active volcano, Barren Island, is roughly 3,000 km away in the Andaman Sea.',
+      href: 'https://volcano.si.edu/volcano.cfm?vn=252140',
+      cta: 'See Barren Island monitoring'
+    },
+  ];
+
+  detailCards.innerHTML = cards.map(c => `
+    <div class="card">
+      <div class="kicker">${c.kicker}</div>
+      <h3>${c.title}</h3>
+      <p>${c.body}</p>
+      <a href="${c.href}" target="_blank" rel="noopener">${c.cta}</a>
+    </div>
+  `).join('');
+
+  mapView.style.display = 'none';
+  detailView.classList.add('open');
+  detailView.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+document.getElementById('backBtn').addEventListener('click', () => {
+  detailView.classList.remove('open');
+  mapView.style.display = '';
+  mapView.scrollIntoView({ behavior:'smooth', block:'start' });
+});
+</script>
+</body>
+</html>
