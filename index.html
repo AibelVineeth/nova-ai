@@ -574,8 +574,8 @@
         browser control, Hindi &amp; Malayalam support, and a one-click installer for Windows.
       </p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="#download">Download Nova free</a>
-        <a class="btn btn-secondary" href="#setup">One-click setup</a>
+        <a class="btn btn-primary" href="Nova-Bundle.zip" download="Nova-Bundle.zip">Download Nova-Bundle.zip</a>
+        <a class="btn btn-secondary" href="#setup">How to install</a>
       </div>
       <p class="meta-line">Python 3.10+ · Windows 10/11 · Microphone · Optional camera · No account required</p>
     </section>
@@ -639,90 +639,73 @@
       </div>
     </section>
 
-    <section id="download" data-search="download free nova.py setup installer requirements yolo model package">
+    <section id="download" data-search="download free nova.py setup installer requirements yolo model package bundle zip">
       <h2>Download Nova AI free</h2>
       <p class="section-lead">
-        Grab the source package and the auto-setup scripts. Host these files on your own server
-        or GitHub Releases and point the links below to the real URLs.
+        One zip has everything. Download it, unzip, then run the setup script.
       </p>
 
+      <div class="panel" style="text-align:center;padding:32px 24px;">
+        <div class="eyebrow" style="margin-bottom:10px;">Recommended</div>
+        <h3 style="font-size:1.25rem;margin-bottom:8px;">Nova complete bundle</h3>
+        <p style="color:var(--text-dim);font-size:0.9rem;max-width:420px;margin:0 auto 18px;">
+          Includes <code>nova.py</code>, auto-installer, Windows launcher, requirements,
+          vision model, and the Kochi map — all in one file (~6 MB).
+        </p>
+        <a class="btn btn-primary" href="Nova-Bundle.zip" download="Nova-Bundle.zip" style="font-size:1.05rem;padding:14px 28px;">
+          Download Nova-Bundle.zip
+        </a>
+        <p class="meta-line" style="margin-top:14px;">
+          After download: unzip → double-click <code>setup_and_run.bat</code> (Windows)
+        </p>
+      </div>
+
+      <p style="margin-top:28px;margin-bottom:12px;color:var(--text-dim);font-size:0.9rem;">
+        Prefer single files? (only if the bundle link fails)
+      </p>
       <div class="panel">
         <div class="file-list">
           <div class="file-row">
             <div>
               <div class="name">nova.py</div>
-              <div class="desc">Main application — single-file assistant (~488 KB source)</div>
+              <div class="desc">Main application</div>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <span class="tag req">Required</span>
-              <a class="btn btn-secondary" href="files/nova.py" download>Download</a>
-            </div>
+            <a class="btn btn-secondary" href="files/nova.py" download="nova.py">Download</a>
           </div>
-
           <div class="file-row">
             <div>
               <div class="name">setup_nova.py</div>
-              <div class="desc">Auto installer — creates a venv, installs every package, downloads the vision model, then launches Nova</div>
+              <div class="desc">Auto installer</div>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <span class="tag req">Required</span>
-              <a class="btn btn-primary" href="files/setup_nova.py" download>Download</a>
-            </div>
+            <a class="btn btn-secondary" href="files/setup_nova.py" download="setup_nova.py">Download</a>
           </div>
-
           <div class="file-row">
             <div>
               <div class="name">setup_and_run.bat</div>
-              <div class="desc">Windows double-click launcher — runs setup_nova.py with the system Python</div>
+              <div class="desc">Windows launcher</div>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <span class="tag req">Windows</span>
-              <a class="btn btn-secondary" href="files/setup_and_run.bat" download>Download</a>
-            </div>
+            <a class="btn btn-secondary" href="files/setup_and_run.bat" download="setup_and_run.bat">Download</a>
           </div>
-
           <div class="file-row">
             <div>
               <div class="name">requirements.txt</div>
-              <div class="desc">Pinned dependency list used by the auto installer</div>
+              <div class="desc">Python packages list</div>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <span class="tag">Optional</span>
-              <a class="btn btn-secondary" href="files/requirements.txt" download>Download</a>
-            </div>
+            <a class="btn btn-secondary" href="files/requirements.txt" download="requirements.txt">Download</a>
           </div>
-
           <div class="file-row">
             <div>
               <div class="name">yolov8n.pt</div>
-              <div class="desc">YOLO vision weights (~6.2 MB). setup_nova.py will download this automatically if missing.</div>
+              <div class="desc">Vision model (~6.2 MB)</div>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <span class="tag">Vision</span>
-              <a class="btn btn-secondary" href="files/yolov8n.pt" download>Download</a>
-            </div>
+            <a class="btn btn-secondary" href="files/yolov8n.pt" download="yolov8n.pt">Download</a>
           </div>
-
           <div class="file-row">
             <div>
               <div class="name">kochi_intelligence_map.html</div>
-              <div class="desc">Bundled interactive Kochi map used by Nova</div>
+              <div class="desc">Bundled Kochi map</div>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <span class="tag">Bundle</span>
-              <a class="btn btn-secondary" href="files/kochi_intelligence_map.html" download>Download</a>
-            </div>
-          </div>
-
-          <div class="file-row">
-            <div>
-              <div class="name">Packaging (build.bat · nova.spec · installer.iss)</div>
-              <div class="desc">For maintainers: build a Windows installer with PyInstaller + Inno Setup</div>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <span class="tag">Dev</span>
-              <a class="btn btn-secondary" href="#setup">See packaging notes</a>
-            </div>
+            <a class="btn btn-secondary" href="files/kochi_intelligence_map.html" download="kochi_intelligence_map.html">Download</a>
           </div>
         </div>
       </div>
