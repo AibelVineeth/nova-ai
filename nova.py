@@ -5,7 +5,10 @@ Everything (conversation, memory, app control, volume, browser automation,
 and camera vision) lives in this one file.
 
 Requirements (core, needed every run):
-    pip install SpeechRecognition edge-tts pygame
+    Installed automatically on first launch (SpeechRecognition, edge-tts,
+    pygame, pystray, Pillow, psutil, PyAudio) - no manual pip install step
+    needed, whether you run this via setup_nova.py or launch nova.py
+    directly. See _ensure_core_packages() below.
 
 Optional, only needed if you use these features (imported lazily, so the
 app starts instantly even if these aren't installed - you'll just get a
@@ -53,6 +56,109 @@ import xml.etree.ElementTree as ET
 import html as _html_module
 import urllib.parse
 from collections import deque
+
+# ---------------------------------------------------------------------
+# Self-installing core dependencies
+# ---------------------------------------------------------------------
+# setup_nova.py (the recommended way to launch Nova) already installs all
+# of this - but nova.py can also end up being run directly (double-clicked,
+# launched from an IDE, a shortcut someone made themselves, etc.), and
+# until now that path just crashed on the first missing import with a bare
+# ModuleNotFoundError. This makes nova.py self-sufficient either way: on
+# startup it checks these core packages, pip-installs anything missing
+# into the current Python environment, then imports them - pygame
+# included. Optional/heavy packages (opencv, mediapipe, torch, selenium,
+# sympy, pycaw...) are untouched here; they stay lazily imported exactly
+# where they're used, same as before, so startup is still fast.
+_CORE_PACKAGES = [
+    ("speech_recognition", "SpeechRecognition>=3.10.0"),
+    ("edge_tts", "edge-tts>=6.1.0"),
+    ("pygame", "pygame>=2.5.0"),
+    ("pystray", "pystray>=0.19.0"),
+    ("PIL", "Pillow>=10.0.0"),
+    ("psutil", "psutil>=5.9.0"),
+    ("pyaudio", "PyAudio>=0.2.13"),
+]
+
+
+def _ensure_core_packages():
+    import importlib
+
+    # A packaged Nova.exe already contains everything it needs, and there
+    # sys.executable is Nova.exe itself - "sys.executable -m pip" would
+    # relaunch the app rather than run pip. Nothing to do.
+    if getattr(sys, "frozen", False):
+        return
+
+    # Packages that failed to install on an earlier launch are remembered
+    # and skipped, so something uninstallable on this machine (PyAudio has
+    # no prebuilt wheel for some Python versions) doesn't cost a slow,
+    # failing pip run on EVERY startup. Delete the marker file to retry.
+    marker = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".nova_install_failed")
+    try:
+        with open(marker, encoding="utf-8") as f:
+            known_failed = {line.strip() for line in f if line.strip()}
+    except OSError:
+        known_failed = set()
+
+    missing, skipped = [], []
+    for module_name, pip_name in _CORE_PACKAGES:
+        try:
+            importlib.import_module(module_name)
+        except ImportError:
+            (skipped if module_name in known_failed else missing).append((module_name, pip_name))
+    if skipped:
+        print("[Nova] Skipping auto-install (failed on an earlier launch): "
+              + ", ".join(p for _, p in skipped)
+              + f"  - delete {os.path.basename(marker)} to retry.")
+    if not missing:
+        return
+
+    print("[Nova] First run (or a package is missing) - installing: "
+          + ", ".join(p for _, p in missing))
+    for module_name, pip_name in missing:
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", pip_name])
+        except Exception as e:
+            print(f"[Nova] Could not install {pip_name}: {e}")
+            if module_name == "pygame":
+                # pygame occasionally fails to build from source on a bare
+                # pip - forcing a prebuilt wheel usually fixes it.
+                print("[Nova] Retrying pygame with a prebuilt wheel...")
+                try:
+                    subprocess.check_call([sys.executable, "-m", "pip", "install",
+                                           "--only-binary=:all:", "pygame"])
+                except Exception as e2:
+                    print(f"[Nova] pygame still failed: {e2}")
+
+    still_missing = []
+    for module_name, pip_name in missing:
+        try:
+            importlib.import_module(module_name)
+        except ImportError:
+            still_missing.append(pip_name)
+    if still_missing:
+        try:
+            failed_modules = {m for m, p in missing if p in still_missing}
+            with open(marker, "w", encoding="utf-8") as f:
+                f.write("\n".join(sorted(known_failed | failed_modules)) + "\n")
+        except OSError:
+            pass  # read-only folder - worst case it just retries next launch
+        print("=" * 56)
+        print("[Nova] Some packages could not be installed automatically:")
+        for p in still_missing:
+            print("   -", p)
+        # Quoted: an unquoted ">=" in cmd/PowerShell/bash is a redirect, so a
+        # copy-pasted hint would silently create a file instead of installing.
+        print(f'[Nova] Try manually:  "{sys.executable}" -m pip install '
+              + " ".join(f'"{p}"' for p in still_missing))
+        print("[Nova] Continuing anyway - the matching feature(s) may not work.")
+        print("=" * 56)
+    else:
+        print("[Nova] All core packages are ready.")
+
+
+_ensure_core_packages()
 
 import speech_recognition as sr
 import edge_tts
